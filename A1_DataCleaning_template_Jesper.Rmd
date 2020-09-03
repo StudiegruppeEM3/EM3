@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1 - Data Cleaning - Instructions"
-author: "Jesper Fischer Ehmsen"
+author: "Jesper Fischer Ehmsen."
 date: "03-09-2020"
 output: html_document
 ---
