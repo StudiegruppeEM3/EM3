@@ -24,12 +24,12 @@ Different researchers involved in the project provide you with different dataset
 
 ## 2. Data cleaning
 
-```{r message=FALSE}
+```{r message=FALSE, warning=FALSE}
 pacman::p_load(tidyverse,janitor, stringr)
 ```
 
 ```{r}
-#loading the three data sets, which contain different data we need. 
+#loading the three data sets, which contain different data we need for the analysis. 
 
 # Demographic data for the participants
 demo_train <- read.csv("demo_train.csv")
