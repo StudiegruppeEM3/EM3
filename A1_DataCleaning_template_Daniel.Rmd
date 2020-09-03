@@ -1,7 +1,7 @@
 ---
 title: "Assignment 1 - Data Cleaning - Instructions"
-author: "[FILL IN YOUR NAME]"
-date: "[FILL IN THE DATE]"
+author: "Daniel Christensen"
+date: "03/09/2020"
 output: html_document
 ---
 
@@ -88,7 +88,13 @@ Tip: look through the chapter on data transformation in R for data science (http
 
 
 ```{r}
+library(tidyverse)
+LU_train <- read.csv("LU_train.csv")
+demo_train <- read.csv("demo_train.csv")
+token_train <- read.csv("token_train.csv")
 
+demo_train <- demo_train %>% rename(SUBJ = Child.ID)
+demo_train <- demo_train %>% rename(VISIT = Visit)
 ```
 
 2b. Find a way to homogeneize the way "visit" is reported (visit1 vs. 1).
@@ -97,8 +103,8 @@ Tip: The stringr package is what you need. str_extract () will allow you to extr
 
 
 ```{r}
-
-
+LU_train$VISIT <- str_extract(LU_train$VISIT, "\\d")
+token_train$VISIT <- str_extract(token_train$VISIT, "\\d")
 ```
 
 2c. We also need to make a small adjustment to the content of the Child.ID coloumn in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
@@ -109,7 +115,9 @@ Tip: You can either have one line of code for each child name that is to be chan
 
 
 ```{r}
-
+demo_train$SUBJ <-  str_replace_all(as.character(demo_train$SUBJ), "[.](?!\\d+$)|,", "")
+LU_train$SUBJ <-  str_replace_all(as.character(LU_train$SUBJ), "[.](?!\\d+$)|,", "")
+token_train$SUBJ <- str_replace_all(as.character(token_train$SUBJ), "[.](?!\\d+$)|,", "")
 ```
 
 2d. Now that the nitty gritty details of the different data sets are fixed, we want to make a subset of each data set only containig the variables that we wish to use in the final data set.
@@ -155,10 +163,27 @@ Some things to pay attention to:
 * make sure to understand whether (and if so why) there are NAs in the dataset (e.g. some measures were not taken at all visits, some recordings were lost or permission to use was withdrawn)
 
 ```{r}
+df <- merge(demo_train,LU_train)
+df <- merge(df,token_train)
 
-
+df <- select(df, SUBJ,VISIT, Ethnicity,Diagnosis,Gender,Age,ADOS,MullenRaw,ExpressiveLangRaw,Socialization,MOT_MLU,CHI_MLU,types_MOT,types_CHI,tokens_MOT,tokens_CHI)
 ```
-
+* Child.ID, 
+* Visit, 
+* Diagnosis, 
+* Ethnicity, 
+* Gender, 
+* Age, 
+* ADOS,  
+* MullenRaw, 
+* ExpressiveLangRaw, 
+* Socialization
+* MOT_MLU, 
+* CHI_MLU, 
+* types_MOT, 
+* types_CHI, 
+* tokens_MOT, 
+* tokens_CHI.
 
 2f. Only using clinical measures from Visit 1
 In order for our models to be useful, we want to miimize the need to actually test children as they develop. In other words, we would like to be able to understand and predict the children's linguistic development after only having tested them once. Therefore we need to make sure that our ADOS, MullenRaw, ExpressiveLangRaw and Socialization variables are reporting (for all visits) only the scores from visit 1.
@@ -171,7 +196,15 @@ A possible way to do so:
 
 
 ```{r}
+df_v1 <- filter(df, df$VISIT == "1")
+df_v1 <- select(df_v1, SUBJ, ADOS,MullenRaw,ExpressiveLangRaw,Socialization)
 
+df_v1 <- df_v1 %>% rename(ADOS1 = ADOS)
+df_v1 <- df_v1 %>% rename(MullenRaw1 = MullenRaw)
+df_v1 <- df_v1 %>% rename(ExpressiveLangRaw1 = ExpressiveLangRaw)
+df_v1 <- df_v1 %>% rename(Socialization1 = Socialization)
+
+df <- merge(df,df_v1)
 ```
 
 2g. Final touches
@@ -182,7 +215,13 @@ Now we want to
 * Save the data set using into a csv file. Hint: look into write.csv()
 
 ```{r}
+df$SUBJ <- as.factor(df$SUBJ)
+df$SUBJ <- as.numeric(df$SUBJ)
 
+df$Gender = ifelse(df$Gender == 1, "F","M")
+df$Diagnosis = ifelse(df$Diagnosis == "A", "ASD", "TD")
+
+#write.csv(df, file = "df_train.csv")
 ```
 
 
