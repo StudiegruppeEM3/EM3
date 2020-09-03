@@ -20,3 +20,5 @@ getwd()
 WOOOOOW
 
 123 astrid hedder jeg
+
+Pernille
