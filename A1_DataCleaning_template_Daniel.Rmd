@@ -271,3 +271,16 @@ USING MUTATE, SUMMARISE and PIPES
 
 
 ```
+
+
+
+
+```{r}
+m1 <- lm(df$types_CHI ~ df$VISIT)
+summary(m1)
+m2 <- lm(df$types_CHI ~ df$Diagnosis)
+summary(m2)
+m3 <- lm(df$types_CHI ~ df$Diagnosis*df$VISIT)
+summary(m3)
+```
+
